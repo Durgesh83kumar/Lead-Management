@@ -1,5 +1,13 @@
 # Lead Management — Real Estate Sales Operating System
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-lead--management--xi--neon.vercel.app-success?style=for-the-badge&logo=vercel)](https://lead-management-xi-neon.vercel.app/)
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)](https://www.python.org/)
+[![Google Gemini](https://img.shields.io/badge/AI-Gemini%20Flash-orange?style=for-the-badge&logo=google)](https://aistudio.google.com/)
+[![Firebase Firestore](https://img.shields.io/badge/Database-Firestore-amber?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
+
+> 🚀 **Live Production URL**: [https://lead-management-xi-neon.vercel.app/](https://lead-management-xi-neon.vercel.app/)  
+> Open and test the live application directly with zero local setup required.
+
 An AI-powered inbound lead qualification, prioritization, and salesperson enablement system designed for high-velocity real estate sales teams. It ingests inbound leads, scores them mathematically using a BANT+ framework, synthesizes pre-call battlecards, provides a lead-grounded conversational copilot, and matches active buyer requirements to verified developer property inventory in 1 click.
 
 Built for the **Masal AI — Forward Deployed Engineer (FDE) Assignment (Round 2)**.
@@ -35,7 +43,7 @@ I built the **Smart Property Matching & Pitch Engine**:
 
 ## 3. System Architecture
 
-![System Architecture](docs/architecture.png)
+![System Architecture](docs/Architecture.png)
 
 ```
 [Inbound Buyer Inquiry] (Web Intake Form / CSV Upload)
@@ -70,8 +78,7 @@ masal_AI/
 │   ├── sample_leads_v2.csv     # Alternative test CSV
 │   └── test_leads.json         # Benchmark dataset for evaluation & local testing
 ├── docs/                       # Architecture diagrams & visual assets
-│   ├── architecture.html       # Visual system architecture source
-│   └── architecture.png        # High-resolution rendered architecture
+│   └── Architecture.png        # High-resolution rendered system architecture
 ├── static/                     # Frontend SPA static assets
 │   ├── app.js                  # Modular SPA controller & reactive view layer
 │   └── style.css               # Clean real estate dashboard design system
@@ -172,8 +179,11 @@ python app.py
 ```
 Open [http://localhost:5000](http://localhost:5000) in your browser.
 
-### Deploying to Vercel
-The repository includes a ready-to-deploy `vercel.json` configured for serverless Python:
+### Live Deployment (Vercel)
+The production application is live and deployed on Vercel at:  
+👉 **[https://lead-management-xi-neon.vercel.app/](https://lead-management-xi-neon.vercel.app/)**
+
+The repository is pre-configured with `vercel.json` for serverless Python deployment:
 1. Push this repository to GitHub.
 2. Import the project into [Vercel](https://vercel.com).
 3. Add `GEMINI_API_KEY` and `FIREBASE_SERVICE_ACCOUNT_JSON` in **Project Settings > Environment Variables**.
