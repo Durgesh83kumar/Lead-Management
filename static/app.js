@@ -1155,10 +1155,10 @@ function loadLeadsFromBackend() {
     .then(res => res.json())
     .then(data => {
       if (data.success && data.leads && data.leads.length > 0) {
-        // Enforce uniqueness by lead name
+        // Enforce uniqueness by lead id (or unique name+phone)
         const seen = new Set();
         leadsData = data.leads.filter(l => {
-          const key = (l.name || "").trim().toLowerCase();
+          const key = l.id || `${(l.name || "").trim().toLowerCase()}_${(l.phone || "").trim()}`;
           if (seen.has(key)) return false;
           seen.add(key);
           return true;
@@ -1173,7 +1173,7 @@ function loadLeadsFromBackend() {
       // Enforce uniqueness on client seed data as well
       const seen = new Set();
       leadsData = leadsData.filter(l => {
-        const key = (l.name || "").trim().toLowerCase();
+        const key = l.id || `${(l.name || "").trim().toLowerCase()}_${(l.phone || "").trim()}`;
         if (seen.has(key)) return false;
         seen.add(key);
         return true;

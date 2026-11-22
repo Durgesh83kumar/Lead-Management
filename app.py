@@ -109,7 +109,17 @@ def intake_lead():
 
     # 3. Form final lead record
     existing_leads = firebase_config.get_all_leads()
-    lead_id = f"L{len(existing_leads) + 1:02d}"
+    max_num = 0
+    for l in existing_leads:
+        lid = str(l.get("id", ""))
+        if lid.startswith("L"):
+            try:
+                num = int(lid[1:])
+                if num > max_num:
+                    max_num = num
+            except ValueError:
+                pass
+    lead_id = f"L{max(max_num + 1, len(existing_leads) + 1):02d}"
 
     is_vip = False
     lower_b = budget.lower()
