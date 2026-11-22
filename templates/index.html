@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lead Management</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2224%22 fill=%22%23E26D5C%22/><text y=%2268%22 x=%2250%22 font-size=%2254%22 font-family=%22sans-serif%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22white%22>L</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    
+    <!-- ====================================================================
+         SIDEBAR NAVIGATION
+         ==================================================================== -->
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-badge">
+          <span class="brand-logo-dot"></span>
+          <span class="brand-title">Lead Management</span>
+        </div>
+      </div>
+
+      <!-- Primary Navigation Links -->
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+          <span>Dashboard</span>
+        </button>
+
+        <button class="nav-item" data-view="leads" onclick="switchView('leads')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span>All Leads</span>
+          <span class="nav-badge" id="nav-count-leads">18</span>
+        </button>
+
+        <button class="nav-item" data-view="pipeline" onclick="switchView('pipeline')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="6" height="18" rx="2"></rect><rect x="9" y="8" width="6" height="13" rx="2"></rect><rect x="16" y="13" width="6" height="8" rx="2"></rect></svg>
+          <span>Pipeline</span>
+          <span class="nav-badge hot-badge" id="nav-count-pipeline">6 Hot</span>
+        </button>
+
+        <button class="nav-item" data-view="properties" onclick="switchView('properties')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>Properties</span>
+          <span class="nav-badge" id="nav-count-properties">20</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- ====================================================================
+         MAIN CONTENT AREA
+         ==================================================================== -->
+    <div class="app-main">
+      
+      <!-- Top Application Header Bar -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <div class="breadcrumb" id="page-breadcrumb">
+            <span class="bc-root" onclick="switchView('dashboard')" style="cursor: pointer;">Lead Management</span>
+            <span class="bc-sep">/</span>
+            <span class="bc-active" id="bc-current-page">Dashboard</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Global Search -->
+          <div class="topbar-search">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="global-search-input" oninput="handleGlobalSearch(this.value)" placeholder="Search by name, location, budget...">
+          </div>
+
+          <button class="btn btn-primary btn-sm" id="btn-topbar-intake" onclick="openIntakeModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            New Lead
+          </button>
+        </div>
+      </header>
+
+      <!-- View Containers -->
+      <div class="view-content-wrapper">
+
+        <!-- ================================================================
+             PAGE 1: DASHBOARD
+             ================================================================ -->
+        <section class="page-view active" id="view-dashboard">
+          
+          <!-- KPI Metric Cards Grid -->
+          <div class="kpi-grid">
+            <div class="kpi-card" onclick="filterAndOpenLeads('all')">
+              <span class="kpi-label">TOTAL LEADS</span>
+              <div class="kpi-number" id="dash-total">18</div>
+              <div class="kpi-footer">Active Inquiries</div>
+            </div>
+
+            <div class="kpi-card kpi-hot" onclick="filterAndOpenLeads('Hot')">
+              <span class="kpi-label">HOT LEADS</span>
+              <div class="kpi-number text-hot" id="dash-hot">6</div>
+              <div class="kpi-footer text-hot">High urgency / ready financing</div>
+            </div>
+
+            <div class="kpi-card kpi-warm" onclick="filterAndOpenLeads('Warm')">
+              <span class="kpi-label">WARM LEADS</span>
+              <div class="kpi-number text-warm" id="dash-warm">9</div>
+              <div class="kpi-footer text-warm">High intent / loan in progress</div>
+            </div>
+
+            <div class="kpi-card kpi-cold" onclick="filterAndOpenLeads('Cold')">
+              <span class="kpi-label">COLD LEADS</span>
+              <div class="kpi-number text-cold" id="dash-cold">4</div>
+              <div class="kpi-footer text-cold">Just browsing / future buy</div>
+            </div>
+          </div>
+
+          <!-- Hot Priority Action Queue -->
+          <div class="dash-section">
+            <div class="dash-section-header">
+              <div class="section-title-wrap">
+                <h2 class="section-heading">High Priority Queue</h2>
+                <span class="section-sub">Immediate outreach required</span>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="switchView('leads')">View All (18)</button>
+            </div>
+
+            <div class="hot-queue-grid" id="dashboard-hot-queue">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             PAGE 2: ALL LEADS LIST TABLE
+             ================================================================ -->
+        <section class="page-view" id="view-leads">
+          <div class="view-header">
+            <div class="view-header-left">
+              <h1 class="view-page-title">All Inbound Leads</h1>
+            </div>
+            
+            <div class="view-controls">
+              <!-- Filter Segment Control -->
+              <div class="filter-segmented-control" id="leads-filter-control">
+                <button class="f-btn active" data-filter="all" onclick="filterAndOpenLeads('all')">All (<span id="filter-count-all">18</span>)</button>
+                <button class="f-btn" data-filter="Hot" onclick="filterAndOpenLeads('Hot')">Hot (<span id="filter-count-hot">6</span>)</button>
+                <button class="f-btn" data-filter="Warm" onclick="filterAndOpenLeads('Warm')">Warm (<span id="filter-count-warm">8</span>)</button>
+                <button class="f-btn" data-filter="Cold" onclick="filterAndOpenLeads('Cold')">Cold (<span id="filter-count-cold">4</span>)</button>
+              </div>
+
+              <!-- Micro-market Dropdown Filter -->
+              <select class="select-filter" id="locality-filter">
+                <option value="all">All Localities</option>
+                <option value="Whitefield">Whitefield</option>
+                <option value="Sarjapur Road">Sarjapur Road</option>
+                <option value="Electronic City">Electronic City</option>
+                <option value="Hebbal">Hebbal</option>
+                <option value="Bannerghatta Road">Bannerghatta Road</option>
+                <option value="Devanahalli">Devanahalli</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Leads Data Table -->
+          <div class="table-container">
+            <table class="leads-table">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">ID</th>
+                  <th style="min-width: 140px;">Name</th>
+                  <th style="min-width: 125px;">Priority & Score</th>
+                  <th style="min-width: 120px;">Location</th>
+                  <th style="min-width: 140px;">Property Req</th>
+                  <th style="min-width: 80px;">Budget</th>
+                  <th style="min-width: 110px;">Timeline</th>
+                  <th style="min-width: 160px;">Key Signal</th>
+                  <th style="text-align: right; width: 80px;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="leads-table-body">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             PAGE 3: PIPELINE & KANBAN VIEW
+             ================================================================ -->
+        <section class="page-view" id="view-pipeline">
+          <div class="view-header">
+            <div class="view-header-left">
+              <h1 class="view-page-title">Lead Pipeline</h1>
+            </div>
+          </div>
+
+          <!-- Kanban Column Board -->
+          <div class="kanban-board">
+            
+            <!-- Column 1: HOT -->
+            <div class="kanban-col col-hot">
+              <div class="col-header">
+                <div class="col-title-wrap">
+                  <span class="col-dot dot-hot"></span>
+                  <h3 class="col-title">Hot Leads</h3>
+                </div>
+                <span class="col-badge badge-hot" id="kanban-count-hot">6</span>
+              </div>
+              <div class="kanban-cards-stack" id="kanban-cards-hot">
+                <!-- Dynamic cards -->
+              </div>
+            </div>
+
+            <!-- Column 2: WARM -->
+            <div class="kanban-col col-warm">
+              <div class="col-header">
+                <div class="col-title-wrap">
+                  <span class="col-dot dot-warm"></span>
+                  <h3 class="col-title">Warm Leads</h3>
+                </div>
+                <span class="col-badge badge-warm" id="kanban-count-warm">9</span>
+              </div>
+              <div class="kanban-cards-stack" id="kanban-cards-warm">
+                <!-- Dynamic cards -->
+              </div>
+            </div>
+
+            <!-- Column 3: COLD -->
+            <div class="kanban-col col-cold">
+              <div class="col-header">
+                <div class="col-title-wrap">
+                  <span class="col-dot dot-cold"></span>
+                  <h3 class="col-title">Cold Leads</h3>
+                </div>
+                <span class="col-badge badge-cold" id="kanban-count-cold">3</span>
+              </div>
+              <div class="kanban-cards-stack" id="kanban-cards-cold">
+                <!-- Dynamic cards -->
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================================================================
+             PAGE: PROPERTIES CATALOG (INVENTED FEATURE)
+             ================================================================ -->
+        <section class="page-view" id="view-properties">
+          <div class="view-header">
+            <div class="view-header-left">
+              <h1 class="view-page-title">Properties Directory</h1>
+            </div>
+            
+            <div class="view-controls">
+              <!-- Location Filter -->
+              <select class="select-filter" id="prop-locality-filter" onchange="renderPropertiesCatalog()">
+                <option value="all">All Locations (20)</option>
+                <option value="Whitefield">Whitefield</option>
+                <option value="Sarjapur Road">Sarjapur Road</option>
+                <option value="Electronic City">Electronic City</option>
+                <option value="Hebbal">Hebbal</option>
+                <option value="Bannerghatta Road">Bannerghatta Road</option>
+                <option value="Devanahalli">Devanahalli</option>
+              </select>
+
+              <!-- BHK Filter -->
+              <select class="select-filter" id="prop-bhk-filter" onchange="renderPropertiesCatalog()">
+                <option value="all">All Configurations</option>
+                <option value="1BHK">1BHK</option>
+                <option value="2BHK">2BHK</option>
+                <option value="3BHK">3BHK</option>
+                <option value="4BHK">4BHK</option>
+                <option value="Plot">Plot / Villa</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Properties Grid -->
+          <div class="properties-catalog-grid" id="properties-catalog-grid">
+            <!-- Dynamic property cards -->
+          </div>
+        </section>
+
+        <!-- ================================================================
+             PAGE 4: DEDICATED FULL LEAD PAGE
+             ================================================================ -->
+        <section class="page-view" id="view-lead-detail">
+          
+          <!-- Back Bar -->
+          <div class="lead-detail-back-bar">
+            <button class="btn btn-secondary btn-sm" id="btn-back-to-leads">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+              Back to Leads
+            </button>
+            <div class="lead-detail-actions">
+              <button class="btn btn-secondary btn-sm" id="btn-prev-lead">Previous</button>
+              <button class="btn btn-secondary btn-sm" id="btn-next-lead">Next</button>
+              <button class="btn btn-whatsapp btn-sm" id="btn-detail-whatsapp">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                WhatsApp
+              </button>
+            </div>
+          </div>
+
+          <!-- Hero Dossier Banner -->
+          <div class="lead-full-hero">
+            <div class="hero-main">
+              <div class="hero-top-badges">
+                <span class="lead-id-pill" id="detail-id">L01</span>
+                <span class="tag-badge tag-hot" id="detail-tag">Hot Lead</span>
+                <span class="vip-badge" id="detail-vip" style="display: none;">Luxury Lead</span>
+              </div>
+              <h1 class="detail-buyer-name" id="detail-name">Rohit Kulkarni</h1>
+              <div class="detail-meta-grid">
+                <div class="meta-box">
+                  <span class="m-label">LOCATION</span>
+                  <span class="m-val" id="detail-loc">Whitefield</span>
+                </div>
+                <div class="meta-box">
+                  <span class="m-label">PHONE NO.</span>
+                  <span class="m-val" id="detail-phone">+91 98450 12345</span>
+                </div>
+                <div class="meta-box">
+                  <span class="m-label">PROPERTY REQUIREMENT</span>
+                  <span class="m-val" id="detail-prop">3BHK apartment, ready to move</span>
+                </div>
+                <div class="meta-box">
+                  <span class="m-label">BUDGET</span>
+                  <span class="m-val text-coral" id="detail-budget">₹1.6 Cr</span>
+                </div>
+                <div class="meta-box">
+                  <span class="m-label">BUYING TIMELINE</span>
+                  <span class="m-val" id="detail-timeline">Within 1 month</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Score Display -->
+            <div class="hero-score-box">
+              <div class="score-large" id="detail-score">95</div>
+              <div class="score-scale">/ 100</div>
+              <div class="score-sub">Priority Score</div>
+            </div>
+          </div>
+
+          <!-- 2-Column Full Layout -->
+          <div class="detail-columns-layout">
+            
+            <!-- Left Side: Inbound message, BANT, Signals & Pre-call Battlecard -->
+            <div class="detail-main-col">
+              
+              <!-- Customer Raw Message Card -->
+              <div class="d-card">
+                <div class="d-card-header">
+                  <span class="card-tag">Customer Inquiry</span>
+                </div>
+                <blockquote class="customer-quote-large" id="detail-message">
+                  <!-- Dynamic text -->
+                </blockquote>
+              </div>
+
+              <!-- Signals & Objections 2-Col -->
+              <div class="d-two-col">
+                <div class="d-card">
+                  <div class="d-card-header">
+                    <span class="card-tag text-success">Key Buying Signals</span>
+                  </div>
+                  <ul class="signal-tag-list" id="detail-signals">
+                    <!-- Dynamic signals -->
+                  </ul>
+                </div>
+
+                <div class="d-card">
+                  <div class="d-card-header">
+                    <span class="card-tag text-warning">Objections & Concerns</span>
+                  </div>
+                  <ul class="objection-tag-list" id="detail-objections">
+                    <!-- Dynamic objections -->
+                  </ul>
+                </div>
+              </div>
+
+              <!-- PRE-CALL BATTLECARD -->
+              <div class="d-card battlecard-detail-card">
+                <div class="battlecard-hero-banner">
+                  <h3 class="bc-title">Pre-Call Battlecard</h3>
+                  <p class="bc-sub">Action plan and response tailored for this lead.</p>
+                </div>
+
+                <div class="battlecard-inner-body">
+                  <!-- Opening Hook -->
+                  <div class="hook-box">
+                    <span class="hook-label">Call Opening Hook</span>
+                    <p class="hook-text" id="detail-hook">
+                      <!-- Dynamic hook -->
+                    </p>
+                  </div>
+
+                  <!-- Prescribed Action -->
+                  <div class="action-box">
+                    <div class="action-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    </div>
+                    <div class="action-details">
+                      <span class="action-title">Recommended Action</span>
+                      <p class="action-desc" id="detail-next-action">Call within 15 minutes to confirm site visit.</p>
+                    </div>
+                  </div>
+
+                  <!-- SMART PROPERTY MATCHING ENGINE (INVENTED FEATURE) -->
+                  <div class="matched-properties-section">
+                    <div class="matched-props-header">
+                      <div class="mph-left">
+                        <span class="mph-badge">INVENTORY MATCH ENGINE</span>
+                        <h4 class="mph-title">Matched Properties For Pitch</h4>
+                      </div>
+                      <span class="mph-sub">Ranked by location, budget & timeline fit</span>
+                    </div>
+
+                    <div class="matched-props-list" id="detail-matched-properties">
+                      <!-- Dynamically populated top 2-3 matched property cards -->
+                    </div>
+                  </div>
+
+                  <!-- Suggested WhatsApp Response Composer -->
+                  <div class="reply-composer-wrap">
+                    <div class="composer-header">
+                      <span class="composer-title">Suggested WhatsApp Message</span>
+                      <button class="btn-copy" id="btn-detail-copy">Copy</button>
+                    </div>
+                    <textarea class="reply-textarea" id="detail-reply" rows="4"></textarea>
+                    
+                    <div class="composer-actions">
+                      <button class="btn btn-whatsapp" id="btn-detail-whatsapp-action">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                        Send via WhatsApp
+                      </button>
+                      <button class="btn btn-secondary" id="btn-detail-regen">
+                        Regenerate
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       FLOATING CHAT COPILOT WIDGET (MODERN FAB & DRAWER)
+       Visible only when a lead detail page is opened
+       ==================================================================== -->
+  <div class="copilot-widget-wrapper" id="copilot-widget-wrapper" style="display: none;">
+    <!-- Floating Trigger Button -->
+    <button class="copilot-fab-btn" id="copilot-fab-btn" onclick="toggleCopilotWidget()" title="Open Lead Copilot">
+      <svg class="fab-icon-chat" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      <svg class="fab-icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display: none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <span class="fab-label">Lead Copilot</span>
+    </button>
+
+    <!-- Floating Chat Window / Card -->
+    <div class="copilot-widget-panel" id="copilot-widget-panel" style="display: none;">
+      <div class="copilot-head">
+        <div class="copilot-title-row">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E26D5C" stroke-width="2.2"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"></path><path d="M12 6v6l4 2"></path></svg>
+          <h3 class="copilot-title">Lead Copilot</h3>
+        </div>
+        <div class="copilot-head-right">
+          <span class="copilot-context-badge" id="detail-copilot-context">Rohit Kulkarni</span>
+          <button class="btn-close-widget" onclick="toggleCopilotWidget()">&times;</button>
+        </div>
+      </div>
+
+      <!-- Quick Prompt Pills -->
+      <div class="detail-quick-prompts">
+        <button class="q-pill" data-prompt="What should I emphasize most on the call?">What to emphasize?</button>
+        <button class="q-pill" data-prompt="How should I handle their pricing or OC objection?">Handle objection</button>
+        <button class="q-pill" data-prompt="Draft a Hinglish negotiation pitch for this buyer.">Draft in Hinglish</button>
+      </div>
+
+      <!-- Chat History Stream -->
+      <div class="detail-chat-stream" id="detail-chat-stream">
+        <div class="chat-message assistant">
+          <div class="msg-avatar">A</div>
+          <div class="msg-bubble">
+            <p>I'm your assistant grounded in this lead. How can I help you prepare for this customer?</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copilot Input -->
+      <form class="detail-chat-input-row" id="detail-chat-form">
+        <input type="text" id="detail-chat-input" placeholder="Ask about this lead..." autocomplete="off">
+        <button type="submit" class="btn-send-chat" aria-label="Send">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL: INTAKE NEW LEAD (MANUAL LEAD & IMPORT CSV)
+       ==================================================================== -->
+  <div class="modal-overlay" id="intake-modal" style="display: none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h2 class="modal-title">Intake New Lead</h2>
+        </div>
+        <button class="btn-close-modal" id="btn-close-modal" onclick="closeIntakeModal()">&times;</button>
+      </div>
+
+      <!-- Mode Selector Tabs: Manual Lead vs Import CSV -->
+      <div class="modal-mode-tabs">
+        <button type="button" class="mode-tab-btn active" id="tab-mode-manual" onclick="switchIntakeMode('manual')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Manual Lead
+        </button>
+        <button type="button" class="mode-tab-btn" id="tab-mode-csv" onclick="switchIntakeMode('csv')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Import CSV
+        </button>
+      </div>
+
+      <!-- 1. MANUAL LEAD FORM -->
+      <form id="intake-form" class="intake-form">
+        <!-- Row 1: Full Name & 10-Digit Phone Number -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="input-name">Full Name *</label>
+            <input type="text" id="input-name" required onfocus="suggestSmartLead()" placeholder="e.g. Ramesh Verma">
+          </div>
+          <div class="form-group">
+            <label for="input-phone">Phone Number (10 Digits) *</label>
+            <input type="tel" id="input-phone" required pattern="[0-9]{10}" maxlength="10" placeholder="e.g. 9876543210">
+          </div>
+        </div>
+
+        <!-- Row 2: Location / Area & Budget -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="input-location">Location / Area *</label>
+            <input type="text" id="input-location" required placeholder="e.g. Whitefield, Sarjapur">
+          </div>
+          <div class="form-group">
+            <label for="input-budget">Budget *</label>
+            <input type="text" id="input-budget" required placeholder="e.g. 1.5 Cr or 85L">
+          </div>
+        </div>
+
+        <!-- Row 3: Property Requirement & Buying Timeline -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="input-prop">Property Requirement *</label>
+            <input type="text" id="input-prop" required placeholder="e.g. 3BHK ready to move">
+          </div>
+          <div class="form-group">
+            <label for="input-timeline">Buying Timeline *</label>
+            <input type="text" id="input-timeline" required placeholder="e.g. Within 1 month">
+          </div>
+        </div>
+
+        <!-- Row 4: Customer Message / Transcript -->
+        <div class="form-group">
+          <label for="input-message">Customer Message / Transcript *</label>
+          <textarea id="input-message" rows="4" required placeholder="Enter buyer message or chat transcript..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <div class="modal-footer-left"></div>
+          <div class="modal-footer-right">
+            <button type="button" class="btn btn-secondary" onclick="closeIntakeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-lead">
+              Lead Analysis
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- 2. IMPORT CSV PANE -->
+      <div id="csv-import-pane" class="csv-import-pane" style="display: none;">
+        <div class="csv-dropzone" id="csv-dropzone">
+          <svg class="csv-upload-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          <h4 class="dropzone-title">Upload Leads CSV</h4>
+          <p class="dropzone-sub">Drag and drop your spreadsheet or click to browse</p>
+          <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('csv-file-input').click()">
+            Browse Files (.csv)
+          </button>
+          <span class="csv-hint">Expected columns: Name, Phone, Location, Property Requirement, Budget, Buying Timeline, Message</span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeIntakeModal()">Cancel</button>
+          <button type="button" class="btn btn-primary" id="btn-process-csv" onclick="handleCsvUpload()">
+            Import & Prioritize Leads
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Application Logic -->
+  <script src="/static/app.js"></script>
+</body>
+</html>
