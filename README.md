@@ -1,11 +1,13 @@
 # Lead Management — Real Estate Sales Operating System
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-lead--management--xi--neon.vercel.app-success?style=for-the-badge&logo=vercel)](https://lead-management-xi-neon.vercel.app/)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/Durgesh83kumar/Lead-Management)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Google Gemini](https://img.shields.io/badge/AI-Gemini%20Flash-orange?style=for-the-badge&logo=google)](https://aistudio.google.com/)
 [![Firebase Firestore](https://img.shields.io/badge/Database-Firestore-amber?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
 
 > 🚀 **Live Production URL**: [https://lead-management-xi-neon.vercel.app/](https://lead-management-xi-neon.vercel.app/)  
+> 📂 **GitHub Repository**: [https://github.com/Durgesh83kumar/Lead-Management](https://github.com/Durgesh83kumar/Lead-Management)  
 > Open and test the live application directly with zero local setup required.
 
 An AI-powered inbound lead qualification, prioritization, and salesperson enablement system designed for high-velocity real estate sales teams. It ingests inbound leads, scores them mathematically using a BANT+ framework, synthesizes pre-call battlecards, provides a lead-grounded conversational copilot, and matches active buyer requirements to verified developer property inventory in 1 click.
@@ -62,7 +64,7 @@ I built the **Smart Property Matching & Pitch Engine**:
 ### Repository Structure
 
 ```text
-masal_AI/
+Lead-Management/
 ├── app.py                      # Flask backend API & WSGI entry point (Root)
 ├── vercel.json                 # Vercel serverless deployment configuration (Root)
 ├── requirements.txt            # Python dependencies (Root)
@@ -137,8 +139,8 @@ python tests/run_ai_eval.py
 
 1. **Clone the Repository**:
 ```bash
-git clone https://github.com/<your-username>/masal_AI.git
-cd masal_AI
+git clone https://github.com/Durgesh83kumar/Lead-Management.git
+cd Lead-Management
 ```
 
 2. **Create & Activate a Virtual Environment**:
